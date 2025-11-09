@@ -1,0 +1,47 @@
+{
+  "name": "binance-arbitrage-bot",
+  "version": "1.0.0",
+  "description": "Comprehensive Binance cryptocurrency arbitrage trading bot with real-time WebSocket feeds, auto-trading, and profit detection",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js --cron",
+    "scan": "node index.js --scan",
+    "websocket": "node index.js --websocket",
+    "hybrid": "node index.js --hybrid",
+    "cron": "node index.js --cron",
+    "test": "node src/core/triangularArbitrage.js",
+    "test-scanner": "node src/scanner/multiTriangleScanner.js",
+    "test-selector": "node src/strategies/opportunitySelector.js",
+    "test-cron": "node src/scheduler/cronScheduler.js",
+    "test-agents": "node test_agents.js",
+    "dashboard": "node src/agents/agentDashboard.js",
+    "test-marketing": "node src/agents/marketingAgent.js",
+    "trade": "node src/trading/autoTrader.js"
+  },
+  "keywords": [
+    "binance",
+    "arbitrage",
+    "crypto",
+    "trading",
+    "bot",
+    "websocket",
+    "ccxt"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "axios": "^1.6.2",
+    "ccxt": "^4.2.0",
+    "decimal.js": "^10.6.0",
+    "dotenv": "^16.3.1",
+    "mongodb": "^6.3.0",
+    "node-cron": "^4.2.1",
+    "node-telegram-bot-api": "^0.64.0",
+    "ws": "^8.16.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
