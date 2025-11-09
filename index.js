@@ -11,6 +11,7 @@ import { MongoLogger, logger } from './src/logger/mongoLogger.js';
 import { TelegramAlerts, telegramAlerts } from './src/alerts/telegramBot.js';
 import { GeminiAnalyzer, geminiAnalyzer } from './src/ai/geminiAnalyzer.js';
 import NewsFeed from './src/alerts/newsFeed.js';
+import { ForexGoldFeed } from './src/alerts/forexGoldFeed.js';
 
 // Agentic AI imports
 import { autonomousAgent } from './src/agents/autonomousArbitrageAgent.js';
@@ -198,6 +199,10 @@ class ArbitrageBot {
         maxItems: config.news.maxItems
       });
     }
+
+    // Initialize Forex Gold/USD Specialized Feed
+    console.log('\x1b[33m[FOREX-GOLD]\x1b[0m \x1b[36m>>>\x1b[0m Initializing Gold/USD Forex Feed...');
+    this.forexGoldFeed = new ForexGoldFeed();
 
     // Initialize Auto-Trader (if enabled)
     if (config.trading.autoTradeEnabled) {
@@ -929,6 +934,57 @@ class ArbitrageBot {
       factors,
       finalScore: Math.round(finalScore)
     };
+  }
+
+  /**
+   * Schedule Forex Gold/USD specialized content
+   */
+  scheduleForexGoldContent() {
+    if (!this.forexGoldFeed || !this.telegram) {
+      console.log('💰 Forex Gold Feed not available for scheduling');
+      return;
+    }
+
+    // Gold/USD News - Every 5 minutes
+    this.cronScheduler.schedule('forex-gold-news', '*/5 * * * *', async () => {
+      try {
+        const newsUpdate = await this.forexGoldFeed.fetchGoldNews();
+        if (newsUpdate) {
+          await this.telegram.sendChannelMessage(newsUpdate);
+          console.log('\x1b[32m[FOREX-NEWS]\x1b[0m >>> Sent Gold/USD news update');
+        }
+      } catch (err) {
+        console.error('\x1b[31m[FOREX-NEWS]\x1b[0m >>> Failed to send Gold news', err.message);
+      }
+    });
+
+    // Gold Trading Lessons - Every 10 minutes
+    this.cronScheduler.schedule('forex-gold-lessons', '*/10 * * * *', async () => {
+      try {
+        const lesson = await this.forexGoldFeed.generateLesson();
+        if (lesson) {
+          await this.telegram.sendChannelMessage(lesson);
+          console.log('\x1b[32m[FOREX-LESSON]\x1b[0m >>> Sent Gold trading lesson');
+        }
+      } catch (err) {
+        console.error('\x1b[31m[FOREX-LESSON]\x1b[0m >>> Failed to send lesson', err.message);
+      }
+    });
+
+    // Hidden Gold Strategies - Every 10 minutes (offset by 5 minutes from lessons)
+    this.cronScheduler.schedule('forex-gold-strategies', '5,15,25,35,45,55 * * * *', async () => {
+      try {
+        const strategy = await this.forexGoldFeed.generateStrategy();
+        if (strategy) {
+          await this.telegram.sendChannelMessage(strategy);
+          console.log('\x1b[32m[FOREX-STRATEGY]\x1b[0m >>> Sent hidden Gold strategy');
+        }
+      } catch (err) {
+        console.error('\x1b[31m[FOREX-STRATEGY]\x1b[0m >>> Failed to send strategy', err.message);
+      }
+    });
+
+    console.log('✅ Forex Gold/USD content schedules configured (News: 5min, Lessons: 10min, Strategies: 10min)');
   }
 
   /**
@@ -1838,6 +1894,9 @@ Be inspiring, professional, and focused on discipline and profit. Format as a br
 
     // Add forex channel communicator scheduled tasks
     this.scheduleForexCommunications();
+
+    // Forex Gold/USD specialized content schedules
+    this.scheduleForexGoldContent();
 
     // Start all scheduled jobs
     this.cronScheduler.start();

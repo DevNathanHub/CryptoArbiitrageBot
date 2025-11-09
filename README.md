@@ -94,6 +94,28 @@ Every channel update now includes strategic trading wisdom from 7 personality-dr
 
 Each message seamlessly integrates trading discipline content to transform your bot into a complete **Trading Coach** system.
 
+### 💰 Forex Gold/USD Specialized Feed (⭐ NEWEST!)
+**Professional XAU/USD Trading Education & Strategies**
+
+Dedicated Gold trading content stream with real-time market updates and professional strategies:
+
+- **📰 Gold/USD News** - Real-time XAU/USD market updates, technical analysis, and price action (Every 5 minutes)
+- **🎓 Gold Trading Lessons** - Educational content covering sessions, support/resistance, correlations, Fibonacci, breakouts (Every 10 minutes)
+- **🔥 Hidden Gold Strategies** - Professional insider methods and high-win-rate setups revealed (Every 10 minutes)
+
+**Content Includes:**
+- Support/resistance trading techniques
+- Gold correlation with DXY (Dollar Index)
+- Position sizing for gold volatility
+- Fibonacci retracements on XAU/USD
+- Breakout trading strategies
+- News fade methods
+- Central bank surprise plays
+- Liquidity zone sniper entries
+- Fed Futures prediction techniques
+
+**Specialization:** 100% focused on Gold/USD (XAU/USD) forex trading only.
+
 ## 🚀 Quick Start
 
 ### Prerequisites
