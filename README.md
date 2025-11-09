@@ -79,6 +79,21 @@ A comprehensive Node.js cryptocurrency arbitrage trading bot for Binance featuri
 - **🔄 Multi-Agent Communication** - Inter-agent messaging and consensus decision-making
 - **🎯 Autonomous Trading** - Bot makes intelligent decisions without human intervention
 
+### 🎓 Forex Channel Communicator (⭐ NEW!)
+**Agentic Trading Psychology & Discipline System**
+
+Every channel update now includes strategic trading wisdom from 7 personality-driven AI roles:
+
+- **🎯 Disciplined Thinker** - Stop-loss reminders and trading plan adherence (Weekday mornings @ 8 AM)
+- **📚 Patient Learner** - Chart pattern practice and learning content (Weekly Sundays @ 6 PM)
+- **⚠️ Risk Manager** - Portfolio exposure alerts and position sizing (Every 30 minutes)
+- **📊 Data-Driven Strategist** - Market analysis and technical insights (Every 3 hours)
+- **🧘 Emotion Coach** - Anti-revenge-trading and emotional control (Event-driven)
+- **📈 Analyst** - Trade summaries and performance reviews (Daily @ 10 PM)
+- **🛡️ Financial Guardian** - Over-leverage warnings and capital protection (Monday mornings @ 9 AM)
+
+Each message seamlessly integrates trading discipline content to transform your bot into a complete **Trading Coach** system.
+
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -494,12 +509,27 @@ MIT License - feel free to use for personal or commercial projects
 - CCXT team for universal exchange library
 - Node.js community for excellent packages
 
+## 🌐 Web Platform
+
+**Investment Platform:** [https://crypto.loopnet.tech](https://crypto.loopnet.tech)
+
+Our web platform provides:
+- Real-time arbitrage opportunity tracking
+- Investment portfolio management
+- Live profit analytics and dashboards
+- Telegram Mini App integration
+- Mobile-responsive interface
+- Secure investor onboarding
+
+Visit the platform to monitor bot performance and manage your crypto arbitrage investments!
+
 ## 📧 Support
 
 For issues or questions:
 - Open an issue on GitHub
 - Check existing documentation
 - Review Binance API status
+- Visit our web platform: [crypto.loopnet.tech](https://crypto.loopnet.tech)
 
 ---
 

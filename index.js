@@ -20,6 +20,7 @@ import { goalOrientedAgent } from './src/agents/goalOrientedAgent.js';
 import { memoryAgent } from './src/agents/memoryAgent.js';
 import { selfOptimizationAgent } from './src/agents/selfOptimizationAgent.js';
 import { marketingAgent } from './src/agents/marketingAgent.js';
+import { forexChannelCommunicator } from './src/agents/forexChannelCommunicator.js';
 
 // Enhanced investor metrics tracking
 class InvestorMetricsTracker {
@@ -124,6 +125,7 @@ class ArbitrageBot {
     this.memoryAgent = null;
     this.selfOptimizationAgent = null;
     this.marketingAgent = null;
+    this.forexChannelCommunicator = null;
     this.isRunning = false;
     this.scanInterval = null;
     this.mode = 'cron'; // 'scan', 'websocket', 'auto', 'cron'
@@ -181,8 +183,9 @@ class ArbitrageBot {
       this.telegram = telegramAlerts;
       this.telegram.initialize();
 
-      // Initialize marketing agent now that telegram is ready
+      // Initialize marketing agent and forex communicator now that telegram is ready
       await this.initializeMarketingAgent();
+      await this.initializeForexCommunicator();
     }
 
     // Initialize News Feed (optional)
@@ -227,6 +230,7 @@ class ArbitrageBot {
       this.agentOrchestrator.registerAgent('goal_agent', goalOrientedAgent);
       this.agentOrchestrator.registerAgent('memory_agent', memoryAgent);
       this.agentOrchestrator.registerAgent('optimization_agent', selfOptimizationAgent);
+      this.agentOrchestrator.registerAgent('forex_communicator', forexChannelCommunicator);
 
       if (includeMarketing) {
         this.agentOrchestrator.registerAgent('marketing_agent', marketingAgent);
@@ -238,6 +242,7 @@ class ArbitrageBot {
       this.memoryAgent = memoryAgent;
       this.selfOptimizationAgent = selfOptimizationAgent;
       this.marketingAgent = marketingAgent; // Always keep reference
+      this.forexChannelCommunicator = forexChannelCommunicator;
 
       // Initialize all agents
       await this.agentOrchestrator.initializeAgents();
@@ -281,6 +286,32 @@ class ArbitrageBot {
       }
     } else {
       console.log('⚠️  Marketing Agent initialization skipped - missing dependencies');
+    }
+  }
+
+  /**
+   * Initialize forex channel communicator after telegram is ready
+   */
+  async initializeForexCommunicator() {
+    console.log('🧠 Attempting to initialize Forex Channel Communicator...');
+    console.log(`   Telegram available: ${!!this.telegram}`);
+    console.log(`   Forex communicator available: ${!!this.forexChannelCommunicator}`);
+
+    if (this.telegram && this.forexChannelCommunicator) {
+      try {
+        // Initialize forex communicator with telegram instance
+        await this.forexChannelCommunicator.initialize(this.telegram);
+        console.log('✅ Forex Channel Communicator initialized with Telegram instance');
+
+        // Keep reference
+        this.forexChannelCommunicator = forexChannelCommunicator;
+
+        console.log('✅ Forex Channel Communicator fully initialized and ready');
+      } catch (error) {
+        console.error('❌ Failed to initialize Forex Channel Communicator:', error.message);
+      }
+    } else {
+      console.log('⚠️  Forex Channel Communicator initialization skipped - missing dependencies');
     }
   }
 
@@ -901,6 +932,66 @@ class ArbitrageBot {
   }
 
   /**
+   * Schedule forex channel communications based on personality roles
+   */
+  scheduleForexCommunications() {
+    if (!this.forexChannelCommunicator || !this.forexChannelCommunicator.isActive) {
+      console.log('🧠 Forex Channel Communicator not available for scheduling');
+      return;
+    }
+
+    // Disciplined Thinker - Every weekday morning at 8 AM
+    this.cronScheduler.schedule('disciplined_thinker', '0 8 * * 1-5', () => {
+      this.forexChannelCommunicator.receiveMessage({
+        action: 'scheduled_communication',
+        data: { role: 'disciplined_thinker' }
+      });
+    });
+
+    // Patient Learner - Every Sunday at 6 PM
+    this.cronScheduler.schedule('patient_learner', '0 18 * * 0', () => {
+      this.forexChannelCommunicator.receiveMessage({
+        action: 'scheduled_communication',
+        data: { role: 'patient_learner' }
+      });
+    });
+
+    // Risk Manager - Every 30 minutes
+    this.cronScheduler.schedule('risk_manager', '*/30 * * * *', () => {
+      this.forexChannelCommunicator.receiveMessage({
+        action: 'scheduled_communication',
+        data: { role: 'risk_manager' }
+      });
+    });
+
+    // Data-Driven Strategist - Every 3 hours
+    this.cronScheduler.schedule('data_strategist', '0 */3 * * *', () => {
+      this.forexChannelCommunicator.receiveMessage({
+        action: 'scheduled_communication',
+        data: { role: 'data_strategist' }
+      });
+    });
+
+    // Analyst - Daily at 10 PM
+    this.cronScheduler.schedule('analyst', '0 22 * * *', () => {
+      this.forexChannelCommunicator.receiveMessage({
+        action: 'scheduled_communication',
+        data: { role: 'analyst' }
+      });
+    });
+
+    // Financial Guardian - Every Monday at 9 AM
+    this.cronScheduler.schedule('financial_guardian', '0 9 * * 1', () => {
+      this.forexChannelCommunicator.receiveMessage({
+        action: 'scheduled_communication',
+        data: { role: 'financial_guardian' }
+      });
+    });
+
+    console.log('✅ Forex Channel Communicator scheduled tasks configured');
+  }
+
+  /**
    * Helper function to sleep
    */
   sleep(ms) {
@@ -1292,6 +1383,10 @@ class ArbitrageBot {
 
       // Send quick scan update to channel with profitable opportunities only
       if (this.telegram && process.env.TELEGRAM_CHANNEL_ID && profitable.length > 0) {
+        // Get trading discipline message from Forex Communicator
+        const disciplineMsg = this.forexChannelCommunicator?.generateMessage('disciplined_thinker') || 
+                              'Stick to your stop-loss today. Don\'t chase losses.';
+        
         const scanMessage =
           `⚡ *QUICK SCAN COMPLETE*\n` +
           `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
@@ -1305,6 +1400,9 @@ class ArbitrageBot {
           `• Active Monitoring: ✅ Online\n` +
           `• Next Scan: 2 minutes\n\n` +
           `💰 *Best Opportunity:* ${profitable[0].triangle} (${profitable[0].profitPct.toFixed(4)}%)\n\n` +
+          `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+          `🎯 *TRADING DISCIPLINE:*\n` +
+          `${disciplineMsg}\n\n` +
           `🕐 ${new Date().toLocaleString()}`;
 
         await this.telegram.sendChannelMessage(scanMessage);
@@ -1379,6 +1477,12 @@ class ArbitrageBot {
 
       // Send deep scan update to channel only if opportunities found
       if (this.telegram && process.env.TELEGRAM_CHANNEL_ID && profitable.length > 0) {
+        // Get risk management and emotion coaching messages
+        const riskMsg = this.forexChannelCommunicator?.generateMessage('risk_manager') || 
+                        'Monitor your risk exposure regularly.';
+        const emotionMsg = this.forexChannelCommunicator?.generateMessage('emotion_coach') || 
+                           'Stay calm and follow your trading plan.';
+        
         const deepScanMessage =
           `🔬 *DEEP SCAN COMPLETE*\n` +
           `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
@@ -1395,6 +1499,11 @@ class ArbitrageBot {
           profitable.slice(0, 3).map((opp, i) => 
             `${i + 1}. ${opp.triangle}: ${opp.profitPct.toFixed(4)}%`
           ).join('\n') + '\n\n' +
+          `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+          `⚠️ *RISK MANAGEMENT:*\n` +
+          `${riskMsg}\n\n` +
+          `🧘 *MENTAL GAME:*\n` +
+          `${emotionMsg}\n\n` +
           `🔄 *Next Deep Scan:* 15 minutes\n` +
           `🕐 ${new Date().toLocaleString()}`;
 
@@ -1595,11 +1704,18 @@ Be inspiring, professional, and focused on discipline and profit. Format as a br
           const response = await result.response;
           const motivationText = response.text();
 
+          // Add financial guardian reminder
+          const guardianMsg = this.forexChannelCommunicator?.generateMessage('financialGuardian') || 
+                              'Never risk rent money for trades.';
+
           const message =
             `💎 *EXPERT TRADER MOTIVATION*\n` +
             `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
             `🧠 *Message from AI Trading Expert:*\n\n` +
             `${motivationText}\n\n` +
+            `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+            `🛡️ *SAFETY REMINDER:*\n` +
+            `${guardianMsg}\n\n` +
             `⚡ _Keep hunting those profits!_ ⚡\n\n` +
             `🕐 ${new Date().toLocaleString()}`;
 
@@ -1616,10 +1732,18 @@ Be inspiring, professional, and focused on discipline and profit. Format as a br
           ];
 
           const randomMessage = fallbackMessages[Math.floor(Math.random() * fallbackMessages.length)];
+          
+          // Add financial guardian reminder to fallback too
+          const guardianMsg = this.forexChannelCommunicator?.generateMessage('financialGuardian') || 
+                              'Never risk rent money for trades.';
+          
           const message =
             `💎 *EXPERT TRADER MOTIVATION*\n` +
             `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
             randomMessage + `\n\n` +
+            `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+            `🛡️ *SAFETY REMINDER:*\n` +
+            `${guardianMsg}\n\n` +
             `⚡ _Keep hunting those profits!_ ⚡\n\n` +
             `🕐 ${new Date().toLocaleString()}`;
 
@@ -1635,8 +1759,16 @@ Be inspiring, professional, and focused on discipline and profit. Format as a br
     if (this.newsFeed) {
       newsTask = async () => {
         try {
-          const update = await this.newsFeed.fetchAndFormatUpdate();
+          let update = await this.newsFeed.fetchAndFormatUpdate();
           if (update && this.telegram) {
+            // Append patient learner message
+            const learningMsg = this.forexChannelCommunicator?.generateMessage('patient_learner') || 
+                                'Practice this week\'s chart pattern on demo mode.';
+            
+            update += `\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+                      `📚 *LEARNING TIP:*\n` +
+                      `${learningMsg}`;
+            
             await this.telegram.sendChannelMessage(update);
             console.log('\x1b[36m[NEWS]\x1b[0m >>> Sent news update to channel');
           } else {
@@ -1655,7 +1787,8 @@ Be inspiring, professional, and focused on discipline and profit. Format as a br
       onHealthCheck: healthCheckTask,
       onCleanup: cleanupTask,
       onMarketingUpdate: () => this.marketingAgent.receiveMessage({ action: 'send_scheduled_update' }),
-      onNewsUpdate: newsTask
+      onNewsUpdate: newsTask,
+      onForexCommunication: () => this.scheduleForexCommunications()
     });
 
     // Add motivational message job (every 5 minutes)
@@ -1665,7 +1798,7 @@ Be inspiring, professional, and focused on discipline and profit. Format as a br
     const profitTransactionTask = async () => {
       try {
         if (!this.telegram) return;
-        
+
         // Generate realistic profit transaction
         const pools = ['BTC/ETH', 'ETH/USDT', 'BNB/USDT', 'BTC/BNB', 'ETH/BNB', 'ADA/USDT', 'XRP/USDT'];
         const pool = pools[Math.floor(Math.random() * pools.length)];
@@ -1673,7 +1806,11 @@ Be inspiring, professional, and focused on discipline and profit. Format as a br
         const profitPct = (Math.random() * (0.85 - 0.35) + 0.35).toFixed(4);
         const profit = (amount * profitPct / 100).toFixed(2);
         const duration = Math.floor(Math.random() * 20) + 5; // 5-25 seconds
-        
+
+        // Get data strategist insight
+        const strategyMsg = this.forexChannelCommunicator?.generateMessage('data_strategist') || 
+                            'Market conditions favor disciplined trading.';
+
         const message =
           `✅ *SUCCESSFUL TRADE EXECUTED*\n` +
           `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
@@ -1685,9 +1822,12 @@ Be inspiring, professional, and focused on discipline and profit. Format as a br
           `🔄 *Strategy:* Triangular Arbitrage\n` +
           `🛡️ *Risk Level:* Low\n` +
           `💹 *ROI:* ${profitPct}%\n\n` +
+          `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+          `💡 *MARKET INSIGHT:*\n` +
+          `${strategyMsg}\n\n` +
           `📊 *Our advanced algorithms continuously monitor and execute profitable opportunities across multiple exchanges 24/7.*\n\n` +
           `🕐 ${new Date().toLocaleString()}`;
-        
+
         await this.telegram.sendChannelMessage(message);
         console.log('\x1b[32m[PROFIT-ALERT]\x1b[0m >>> Sent successful transaction update to channel');
       } catch (err) {
@@ -1695,6 +1835,9 @@ Be inspiring, professional, and focused on discipline and profit. Format as a br
       }
     };
     this.cronScheduler.schedule('profit-transactions', '*/3 * * * *', profitTransactionTask);
+
+    // Add forex channel communicator scheduled tasks
+    this.scheduleForexCommunications();
 
     // Start all scheduled jobs
     this.cronScheduler.start();
