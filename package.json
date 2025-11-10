@@ -17,7 +17,17 @@
     "test-agents": "node test_agents.js",
     "dashboard": "node src/agents/agentDashboard.js",
     "test-marketing": "node src/agents/marketingAgent.js",
-    "trade": "node src/trading/autoTrader.js"
+    "trade": "node src/trading/autoTrader.js",
+    "pm2:setup": "bash setup-pm2.sh",
+    "pm2:start": "pm2 start ecosystem.config.json",
+    "pm2:stop": "pm2 stop crypto-arbitrage-bot",
+    "pm2:restart": "pm2 restart crypto-arbitrage-bot",
+    "pm2:logs": "pm2 logs crypto-arbitrage-bot",
+    "pm2:monit": "pm2 monit",
+    "pm2:status": "pm2 status",
+    "ui": "node dashboard.js",
+    "ui:start": "pm2 start dashboard.js --name crypto-dashboard",
+    "ui:stop": "pm2 stop crypto-dashboard"
   },
   "keywords": [
     "binance",
@@ -36,6 +46,7 @@
     "ccxt": "^4.2.0",
     "decimal.js": "^10.6.0",
     "dotenv": "^16.3.1",
+    "express": "^4.21.2",
     "mongodb": "^6.3.0",
     "node-cron": "^4.2.1",
     "node-telegram-bot-api": "^0.64.0",
